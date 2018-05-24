@@ -64,7 +64,8 @@ In:
 .header {}
 .header__logo {}
 .header__cta {}
-.bar {}
+.nav {}
+.nav__item {}
 /* ---------- footer ---------- */
 .footer__contact {}
 .footer__social {}
@@ -82,7 +83,8 @@ Out:
 .header__logo {}
 .header__cta {}
 
-.bar {}
+.nav {}
+.nav__item {}
 
 
 /* ---------- footer ---------- */
@@ -142,6 +144,17 @@ Out:
 ```
 
 [PostCSS]: https://github.com/postcss/postcss
+
+## TODO
+
+- Handle spacing after a media query
+- Group additional related selectors:
+  - `a` with `a:hover, a:focus`, but not `.foo a` with `.bar a:hover`
+  - `input[type="text"]` with `input[type="text"]:focus`
+  - Pseudoelements
+  - `h1` with `h2`, etc?
+- Add aspects to options
+- Option to multiline selectors?
 
 ## Usage
 
