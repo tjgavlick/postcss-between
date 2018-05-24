@@ -91,7 +91,18 @@ module.exports = postcss.plugin('postcss-between', function (options) {
 
       if (rule.type === 'atrule') {
         if (rule.prev()) {
-          rule.raws.before = '\n\n\n';
+          // is this a part of a continuing BEM block?
+          if (rule.nodes.length > 0) {
+            let rules = rule.nodes.filter(node => node.type === 'rule');
+            let selectors = rules.reduce((acc, cur) => acc.concat(cur.selectors), []);
+            if (testBem(cachedBemRoots, selectors)) {
+              rule.raws.before = '\n\n';
+            } else {
+              rule.raws.before = '\n\n\n';
+            }
+          } else {
+            rule.raws.before = '\n\n\n';
+          }
         }
       }
     });

@@ -151,3 +151,25 @@ it('spaces BEM block media queries before', () => {
 }
 `);
 });
+
+it('spaces multiple BEM block media queries before', () => {
+  return run(`
+.foo { display: block; }
+@media print {
+  .foo__element { display: none; }
+}
+@media (min-width: 720px) {
+  .foo { background: #f00 }
+}
+`, `
+.foo { display: block; }
+
+@media print {
+  .foo__element { display: none; }
+}
+
+@media (min-width: 720px) {
+  .foo { background: #f00 }
+}
+`);
+});
