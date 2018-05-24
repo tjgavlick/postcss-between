@@ -34,6 +34,16 @@ em { font-weight: 400; }
 `);
 });
 
+it('avoids spacing related selectors', () => {
+  return run(`
+.foo { padding: 1rem; }
+.foo li { margin: 0; }
+`, `
+.foo { padding: 1rem; }
+.foo li { margin: 0; }
+`);
+});
+
 it('avoids spacing a BEM element', () => {
   return run(`
 .block { padding: 1rem; background: #ccc; }

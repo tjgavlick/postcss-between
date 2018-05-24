@@ -1,27 +1,147 @@
-# PostCSS Between
+# Between
 
 (Upcoming) [PostCSS] plugin that handles spacing between blocks for a more readable stylesheet.
 
-Between will space your blocks in an opinionated manner:
+Between will not apply any formatting to the declarations inside your CSS rules. It will only space blocks, and it will do so based on some opinions:
 
-- If you're using a BEM naming scheme, BEM blocks will be visually grouped by keeping their rules together. Adjacent BEM blocks will be separated by a blank line
-- Two lines before a major section header comment and one line after
-  - A major section header is any comment containing strings of repeated `-`, `_`, `=`, `+`, or `*`
-- Two lines before and after a media query
+### Selector blocks
+
+Spaces most selector blocks, but keeps related items together.
+
+In:
+
+```css
+.foo {}
+.bar {}
+.bar a {}
+```
+
+Out:
+
+```css
+.foo {}
+
+.bar {}
+.bar a {}
+```
+
+This includes BEM blocks.
+
+In:
+
+```css
+.block {}
+
+
+.block__element {}
+.block__element--modifier {}
+
+.another-block {}
+
+.another-block .foo {}
+```
+
+Out:
+
+```css
+.block {}
+.block__element {}
+.block__element--modifier {}
+
+.another-block {}
+.another-block .foo {}
+```
+
+### Comments
+
+Only mess with comments if the comment is a major section heading. By default, a major section heading contains three or more of `-`, `_`, `=`, `+`, or `*` in a row. Override this in the options.
+
+In:
+
+```css
+.foo {}
+/* ---------- header ---------- */
+.header {}
+.header__logo {}
+.header__cta {}
+.bar {}
+/* ---------- footer ---------- */
+.footer__contact {}
+.footer__social {}
+```
+
+Out:
+
+```css
+.foo {}
+
+
+/* ---------- header ---------- */
+
+.header {}
+.header__logo {}
+.header__cta {}
+
+.bar {}
+
+
+/* ---------- footer ---------- */
+
+.footer__contact {}
+.footer__social {}
+```
+
+### Media queries
+
+Media queries are given ample spacing.
+
+In:
+
+```css
+.foo {}
+.bar {}
+@media (min-width: 720px) {
+  .baz {}
+}
+```
+
+Out:
+
+```css
+.foo {}
+
+.bar {}
+
+
+@media (min-width: 720px) {
+  .baz {}
+}
+```
+
+Media query spacing tightens up in a BEM block.
+
+In:
+
+```css
+.block {}
+.block__element {}
+@media (min-width: 720px) {
+  .block__element--modifier {}
+}
+```
+
+Out:
+
+```css
+.block {}
+.block__element {}
+
+@media (min-width: 720px) {
+  .block__element--modifier {}
+}
+```
 
 [PostCSS]: https://github.com/postcss/postcss
-
-```css
-.foo {
-    /* Input example */
-}
-```
-
-```css
-.foo {
-  /* Output example */
-}
-```
 
 ## Usage
 
