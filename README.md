@@ -1,6 +1,6 @@
-# PostCSS Between [![Build Status][ci-img]][ci]
+# PostCSS Between
 
-[PostCSS] plugin that handles spacing between blocks for a more readable stylesheet.
+(Upcoming) [PostCSS] plugin that handles spacing between blocks for a more readable stylesheet.
 
 Between will space your blocks in an opinionated manner:
 
@@ -10,8 +10,6 @@ Between will space your blocks in an opinionated manner:
 - Two lines before and after a media query
 
 [PostCSS]: https://github.com/postcss/postcss
-[ci-img]:  https://travis-ci.org/tjgavlick/postcss-between.svg
-[ci]:      https://travis-ci.org/tjgavlick/postcss-between
 
 ```css
 .foo {
