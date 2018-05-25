@@ -1,10 +1,10 @@
-# Between
+# Between [![Build Status](https://travis-ci.org/tjgavlick/postcss-between.svg?branch=master)](https://travis-ci.org/tjgavlick/postcss-between)
 
 (Upcoming) [PostCSS] plugin that handles spacing between blocks for a more readable stylesheet.
 
 Between will not apply any formatting to the declarations inside your CSS rules. It will only space blocks. Use it as the mastering to Prettier's mixing, for example.
 
-Between spaces blocks based on some *opinions*:
+Between will space blocks based on some *opinions*:
 
 ### Selector blocks
 
