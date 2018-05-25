@@ -18,6 +18,13 @@ module.exports = postcss.plugin('postcss-between', function (options) {
     return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
   }
 
+  // removes combinators from a selector
+  function removeCombinators(selector) {
+    // replace combinators with a space in case author has spaced selector tightly
+    // e.g. li+li
+    return selector.replace(/\+|~(?!=)|>/g, ' ').replace(/\s+/, ' ');
+  }
+
   // determines if test selectors are related to predicate selectors
   function testRelated(predicates, selectors) {
     if (!predicates ||
@@ -37,6 +44,7 @@ module.exports = postcss.plugin('postcss-between', function (options) {
     }
 
     for (let selector of selectors) {
+      selector = removeCombinators(selector);
       // class/id blocks
       for (let predicate of namedPredicates) {
         if (selector.indexOf(predicate) >= 0) {
@@ -62,6 +70,7 @@ module.exports = postcss.plugin('postcss-between', function (options) {
   function generateRoots(selectors) {
     let roots = new Set();
     for (let selector of selectors) {
+      selector = removeCombinators(selector);
       // class/id/BEM roots
       for (let stem of selector.split(' ')) {
         if (stem.charAt(0) === '.' || stem.charAt(0) === '#') {

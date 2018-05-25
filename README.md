@@ -151,9 +151,7 @@ Out:
 
 - Group additional related selectors:
   - `h1` with `h2`, etc?
-  - make sure selector relationships (e.g. `+`, `~`) don't throw things off
 - Add aspects to options
-- Option to multiline selectors?
 
 ## Usage
 

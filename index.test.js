@@ -160,6 +160,28 @@ a[href^="/"] { }
 `);
 });
 
+it('doesn\'t choke on element combinators', () => {
+  return run(`
+.foo { }
+.foo ~ li { }
+nav:hover > .foo { }
+.bar + .bar { }
+.bar { }
+a { }
+strong + a { }
+`, `
+.foo { }
+.foo ~ li { }
+nav:hover > .foo { }
+
+.bar + .bar { }
+.bar { }
+
+a { }
+strong + a { }
+`);
+});
+
 it('avoids spacing a BEM element', () => {
   return run(`
 .block { }
