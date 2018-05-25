@@ -2,6 +2,10 @@
 
 (Upcoming) [PostCSS] plugin that handles spacing between blocks for a more readable stylesheet.
 
+- [Usage](#usage)
+- [Examples](#examples)
+- [Options](#options)
+
 ## Usage
 
 ```js
