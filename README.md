@@ -8,9 +8,7 @@
 postcss([ require('postcss-between') ])
 ```
 
-Use with Node 6 or greater.
-
-See [PostCSS] docs for examples for your environment.
+Use with Node 6 or greater. See [PostCSS] docs for examples for your environment.
 
 ## Examples
 
@@ -166,8 +164,39 @@ Out:
 
 [PostCSS]: https://github.com/postcss/postcss
 
-## TODO
 
-- Group additional related selectors:
-  - `h1` with `h2`, etc?
-- Add aspects to options
+## Options
+
+```js
+const between = require('postcss-between');
+postcss([
+  between({
+    // options
+  })
+]);
+```
+
+### headingCommentIdentifiers
+
+Type: `Array` of `string`s, default: `[ '---', '===', '___', '+++', '***']`
+
+A set of strings that, when found in a comment, mark that comment as a major section heading.
+
+### breakMultipleSelectors
+
+Type: `boolean`, default: `false`
+
+Set to `true` in order to force the breaking of multiple selectors to new lines. This is the only time that Between will alter existing block formatting.
+
+In:
+
+```css
+a:hover, a:focus {}
+```
+
+Out:
+
+```css
+a:hover,
+a:focus {}
+```

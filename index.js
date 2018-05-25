@@ -2,6 +2,7 @@ const postcss = require('postcss');
 
 module.exports = postcss.plugin('postcss-between', (opts = {}) => {
   opts = Object.assign({
+    breakMultipleSelectors: false,
     headingCommentIdentifiers: [ '---', '===', '___', '+++', '***']
   }, opts);
 
@@ -99,6 +100,11 @@ module.exports = postcss.plugin('postcss-between', (opts = {}) => {
     var cachedRoots = [];
     root.walk(rule => {
       if (rule.type === 'rule') {
+        // break multiple selectors to new lines
+        if (opts.breakMultipleSelectors) {
+          rule.selector = rule.selector.replace(/\s*,\s*/g, ',\n');
+        }
+
         // no need to space above if it's the first rule
         if (rule.prev() === undefined) {
           cachedRoots = generateRoots(rule.selectors);

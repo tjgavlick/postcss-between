@@ -436,3 +436,50 @@ it('isolates empty @rules', () => {
 .bar {}
 `);
 });
+
+
+/*
+ * selector newline option
+ * -----------------------
+ */
+
+
+it('retains existing selectors by default', () => {
+  return run(`
+a:hover, a:focus {}
+button:hover,
+button:focus {}
+input[type="submit"]:hover,
+
+input[type="submit"]:focus {}
+`, `
+a:hover, a:focus {}
+
+button:hover,
+button:focus {}
+
+input[type="submit"]:hover,
+
+input[type="submit"]:focus {}
+`);
+});
+
+it('breaks multiple selectors to new lines when requested', () => {
+  return run(`
+a:hover, a:focus {}
+button:hover,
+button:focus {}
+input[type="submit"]:hover,
+
+input[type="submit"]:focus {}
+`, `
+a:hover,
+a:focus {}
+
+button:hover,
+button:focus {}
+
+input[type="submit"]:hover,
+input[type="submit"]:focus {}
+`, { breakMultipleSelectors: true });
+});
