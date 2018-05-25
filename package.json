@@ -15,12 +15,13 @@
     "spacing",
     "whitespace",
     "blank",
+    "block",
     "readable",
     "readability",
     "scannable",
     "scannability"
   ],
-  "author": "tjgavlick <tjgavlick@gmail.com>",
+  "author": "tjgavlick <8879532+tjgavlick@users.noreply.github.com>",
   "license": "MIT",
   "repository": "tjgavlick/postcss-between",
   "bugs": {
