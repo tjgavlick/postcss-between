@@ -220,3 +220,41 @@ it('spaces multiple BEM block media queries before', () => {
 }
 `);
 });
+
+it('spaces unrelated media queries after', () => {
+  return run(`
+@media print {
+  .foo { }
+}
+.bar { }
+`, `
+@media print {
+  .foo { }
+}
+
+
+.bar { }
+`);
+});
+
+it('spaces related media queries after', () => {
+  return run(`
+.block {}
+.block__element {}
+@media print {
+  .block__element {}
+}
+.block {}
+.block__element {}
+`, `
+.block {}
+.block__element {}
+
+@media print {
+  .block__element {}
+}
+
+.block {}
+.block__element {}
+`);
+});

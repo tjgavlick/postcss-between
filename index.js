@@ -57,12 +57,19 @@ module.exports = postcss.plugin('postcss-between', function (options) {
     ).test(text);
   }
 
+  // main loop
   return function (root) {
     var cachedBemRoots = [];
     root.walk(rule => {
       if (rule.type === 'rule') {
+        // no need to space above if it's the first rule
+        if (rule.prev() === undefined) {
+          cachedBemRoots = generateBemRoots(rule.selectors);
+          return;
+        }
+
         // rule + rule
-        if (rule.prev() && rule.prev().type === 'rule') {
+        if (rule.prev().type === 'rule') {
           // is this rule is in the same BEM block?
           if (testBem(cachedBemRoots, rule.selectors)) {
             rule.raws.before = '\n';
@@ -70,12 +77,24 @@ module.exports = postcss.plugin('postcss-between', function (options) {
             rule.raws.before = '\n\n';
             cachedBemRoots = generateBemRoots(rule.selectors);
           }
+
         // comment + rule
-        } else if (rule.prev() &&
-          rule.prev().type === 'comment' &&
-          testHeading(rule.prev().text)) {
+        } else if (rule.prev().type === 'comment' && testHeading(rule.prev().text)) {
           rule.raws.before = '\n\n';
           cachedBemRoots = generateBemRoots(rule.selectors);
+
+        // @rule + rule
+        } else if (rule.prev().type === 'atrule') {
+          // if we're still in a BEM block, space conservatively
+          if (testBem(cachedBemRoots, rule.selectors)) {
+            rule.raws.before = '\n\n';
+          // otherwise, isolate the block
+          } else {
+            rule.raws.before = '\n\n\n';
+            cachedBemRoots = generateBemRoots(rule.selectors);
+          }
+
+        // anything else + rule
         } else {
           cachedBemRoots = generateBemRoots(rule.selectors);
         }
@@ -90,24 +109,24 @@ module.exports = postcss.plugin('postcss-between', function (options) {
       }
 
       if (rule.type === 'atrule') {
-        if (rule.prev()) {
-          // is this a part of a continuing BEM block?
-          if (rule.nodes.length > 0) {
-            let innerRules = rule.nodes.filter(node => node.type === 'rule');
-            let innerSelectors = Array.from(innerRules.reduce((acc, cur) => {
-              for (let selector of cur.selectors) {
-                acc.add(selector);
-              }
-              return acc;
-            }, new Set()));
-            if (testBem(cachedBemRoots, innerSelectors)) {
-              rule.raws.before = '\n\n';
-            } else {
-              rule.raws.before = '\n\n\n';
+        if (rule.prev() === undefined) return;
+
+        // is this a part of a continuing BEM block?
+        if (rule.nodes.length > 0) {
+          let innerRules = rule.nodes.filter(node => node.type === 'rule');
+          let innerSelectors = Array.from(innerRules.reduce((acc, cur) => {
+            for (let selector of cur.selectors) {
+              acc.add(selector);
             }
+            return acc;
+          }, new Set()));
+          if (testBem(cachedBemRoots, innerSelectors)) {
+            rule.raws.before = '\n\n';
           } else {
             rule.raws.before = '\n\n\n';
           }
+        } else {
+          rule.raws.before = '\n\n\n';
         }
       }
     });
