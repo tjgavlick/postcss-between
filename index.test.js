@@ -483,3 +483,20 @@ input[type="submit"]:hover,
 input[type="submit"]:focus {}
 `, { breakMultipleSelectors: true });
 });
+
+it('preserves initial selector indentation when breaking', () => {
+  return run(`
+@media all {
+  a:hover, a:focus {}
+  button:hover, button:focus {}
+}
+`, `
+@media all {
+  a:hover,
+  a:focus {}
+
+  button:hover,
+  button:focus {}
+}
+`, { breakMultipleSelectors: true });
+});

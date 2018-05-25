@@ -102,7 +102,8 @@ module.exports = postcss.plugin('postcss-between', (opts = {}) => {
       if (rule.type === 'rule') {
         // break multiple selectors to new lines
         if (opts.breakMultipleSelectors) {
-          rule.selector = rule.selector.replace(/\s*,\s*/g, ',\n');
+          let indentation = rule.raws.before.replace(/^[\s\n]*\n/, '');
+          rule.selector = rule.selector.replace(/\s*,\s*/g, ',\n' + indentation);
         }
 
         // no need to space above if it's the first rule
