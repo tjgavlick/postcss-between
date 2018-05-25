@@ -131,6 +131,31 @@ it('spaces section comments', () => {
 `);
 });
 
+it('correctly handles multiline comments', () => {
+  return run(`
+/*
+ * thing
+ */
+.foo { display: block; }
+/*
+ * ---------- major thing ----------
+ */
+.bar { display: block; }
+`, `
+/*
+ * thing
+ */
+.foo { display: block; }
+
+
+/*
+ * ---------- major thing ----------
+ */
+
+.bar { display: block; }
+`);
+});
+
 it('spaces unrelated media queries before', () => {
   return run(`
 .foo { display: block; }
