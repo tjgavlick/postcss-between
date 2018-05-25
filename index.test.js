@@ -258,3 +258,19 @@ it('spaces related media queries after', () => {
 .block__element {}
 `);
 });
+
+it('isolates empty @rules', () => {
+  return run(`
+.foo {}
+@media print { }
+.bar {}
+`, `
+.foo {}
+
+
+@media print { }
+
+
+.bar {}
+`);
+});

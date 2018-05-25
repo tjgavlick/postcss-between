@@ -111,8 +111,8 @@ module.exports = postcss.plugin('postcss-between', function (options) {
       if (rule.type === 'atrule') {
         if (rule.prev() === undefined) return;
 
-        // is this a part of a continuing BEM block?
         if (rule.nodes.length > 0) {
+          // is this a part of a continuing BEM block?
           let innerRules = rule.nodes.filter(node => node.type === 'rule');
           let innerSelectors = Array.from(innerRules.reduce((acc, cur) => {
             for (let selector of cur.selectors) {
@@ -125,6 +125,8 @@ module.exports = postcss.plugin('postcss-between', function (options) {
           } else {
             rule.raws.before = '\n\n\n';
           }
+
+        // if no children, isolate the @rule
         } else {
           rule.raws.before = '\n\n\n';
         }
