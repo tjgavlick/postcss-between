@@ -58,7 +58,22 @@ em { }
 `);
 });
 
-it('avoids spacing related selectors', () => {
+it('groups related selectors by element', () => {
+  return run(`
+div { }
+div p { }
+a { }
+strong a { }
+`, `
+div { }
+div p { }
+
+a { }
+strong a { }
+`);
+});
+
+it('groups related selectors by class', () => {
   return run(`
 .foo { }
 .foo li { }
@@ -71,12 +86,12 @@ it('avoids spacing related selectors', () => {
 it('avoids spacing a BEM element', () => {
   return run(`
 .block { }
-.block--modifier {}
+.block--modifier { }
 .block__element { }
 .block__element--modifier { }
 `, `
 .block { }
-.block--modifier {}
+.block--modifier { }
 .block__element { }
 .block__element--modifier { }
 `);
@@ -98,9 +113,11 @@ it('finds non-explicit or nested BEM blocks', () => {
 .no-js .block__foo { }
 
 .block__bar--baz strong { }
+.js .block { }
 `, `
 .no-js .block__foo { }
 .block__bar--baz strong { }
+.js .block { }
 `);
 });
 

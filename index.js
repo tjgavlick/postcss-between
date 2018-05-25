@@ -18,17 +18,40 @@ module.exports = postcss.plugin('postcss-between', function (options) {
     return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
   }
 
-  // determines if selectors are related to the predicate
+  // determines if test selectors are related to predicate selectors
   function testRelated(predicates, selectors) {
     if (!predicates ||
         !selectors ||
         predicates.length === 0 ||
         selectors.length === 0) return false;
 
+    // group predicates by named (classes, ids) and other
+    let namedPredicates = [];
+    let otherPredicates = [];
     for (let predicate of predicates) {
-      for (let selector of selectors) {
-        if (selector.indexOf(predicate) === 0) {
+      if (predicate.charAt(0) === '.' || predicate.charAt(0) === '#') {
+        namedPredicates.push(predicate);
+      } else {
+        otherPredicates.push(predicate);
+      }
+    }
+
+    for (let selector of selectors) {
+      // class/id blocks
+      for (let predicate of namedPredicates) {
+        if (selector.indexOf(predicate) >= 0) {
           return true;
+        }
+      }
+      // other elements
+      for (let predicate of otherPredicates) {
+        let elements = selector.match(/^[a-zA-Z ]+/);
+        if (elements) {
+          for (let element of elements[0].split(' ')) {
+            if (element.indexOf(predicate) === 0) {
+              return true;
+            }
+          }
         }
       }
     }
@@ -39,10 +62,17 @@ module.exports = postcss.plugin('postcss-between', function (options) {
   function generateRoots(selectors) {
     let roots = new Set();
     for (let selector of selectors) {
+      // class/id/BEM roots
       for (let stem of selector.split(' ')) {
-        // classes, trimming BEM blocks
         if (stem.charAt(0) === '.' || stem.charAt(0) === '#') {
-          roots.add(stem.replace(/(__|\-\-).*$/g, ''));
+          roots.add(stem.replace(/(__|\-\-).*$/, ''));
+        }
+      }
+      // plain elements, if not already handled by a class/id block
+      let elements = selector.match(/^[a-zA-Z ]+/);
+      if (elements) {
+        for (let element of elements[0].split(' ')) {
+          roots.add(element);
         }
       }
     }
@@ -60,44 +90,44 @@ module.exports = postcss.plugin('postcss-between', function (options) {
 
   // main loop
   return function (root) {
-    var cachedBemRoots = [];
+    var cachedRoots = [];
     root.walk(rule => {
       if (rule.type === 'rule') {
         // no need to space above if it's the first rule
         if (rule.prev() === undefined) {
-          cachedBemRoots = generateRoots(rule.selectors);
+          cachedRoots = generateRoots(rule.selectors);
           return;
         }
 
         // rule + rule
         if (rule.prev().type === 'rule') {
           // is this rule is in the same BEM block?
-          if (testRelated(cachedBemRoots, rule.selectors)) {
+          if (testRelated(cachedRoots, rule.selectors)) {
             rule.raws.before = '\n';
           } else {
             rule.raws.before = '\n\n';
-            cachedBemRoots = generateRoots(rule.selectors);
+            cachedRoots = generateRoots(rule.selectors);
           }
 
         // comment + rule
         } else if (rule.prev().type === 'comment' && testHeading(rule.prev().text)) {
           rule.raws.before = '\n\n';
-          cachedBemRoots = generateRoots(rule.selectors);
+          cachedRoots = generateRoots(rule.selectors);
 
         // @rule + rule
         } else if (rule.prev().type === 'atrule') {
           // if we're still in a BEM block, space conservatively
-          if (testRelated(cachedBemRoots, rule.selectors)) {
+          if (testRelated(cachedRoots, rule.selectors)) {
             rule.raws.before = '\n\n';
           // otherwise, isolate the block
           } else {
             rule.raws.before = '\n\n\n';
-            cachedBemRoots = generateRoots(rule.selectors);
+            cachedRoots = generateRoots(rule.selectors);
           }
 
         // anything else + rule
         } else {
-          cachedBemRoots = generateRoots(rule.selectors);
+          cachedRoots = generateRoots(rule.selectors);
         }
       }
 
@@ -121,7 +151,7 @@ module.exports = postcss.plugin('postcss-between', function (options) {
             }
             return acc;
           }, new Set()));
-          if (testRelated(cachedBemRoots, innerSelectors)) {
+          if (testRelated(cachedRoots, innerSelectors)) {
             rule.raws.before = '\n\n';
           } else {
             rule.raws.before = '\n\n\n';
