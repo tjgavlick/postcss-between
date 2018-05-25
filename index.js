@@ -1,19 +1,11 @@
 const postcss = require('postcss');
 
-const defaults = {
-  headingCommentIdentifiers: [
-    '---',
-    '===',
-    '___',
-    '+++',
-    '***'
-  ]
-};
+module.exports = postcss.plugin('postcss-between', (opts = {}) => {
+  opts = Object.assign({
+    headingCommentIdentifiers: [ '---', '===', '___', '+++', '***']
+  }, opts);
 
-module.exports = postcss.plugin('postcss-between', function (options) {
-  options = Object.assign(defaults, options || {});
-
-  // utility to escape a string for safe insertion into a RegExp
+  // escape a string for safe insertion into a RegExp
   function escapeRegExp(str) {
     return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
   }
@@ -91,14 +83,14 @@ module.exports = postcss.plugin('postcss-between', function (options) {
   // determines if a given comment is a 'heading' comment
   function testHeading(text) {
     return new RegExp(
-      options.headingCommentIdentifiers
+      opts.headingCommentIdentifiers
         .map(str => escapeRegExp(str))
         .join('|')
     ).test(text);
   }
 
-  // main loop
-  return function (root) {
+
+  return root => {
     var cachedRoots = [];
     root.walk(rule => {
       if (rule.type === 'rule') {
