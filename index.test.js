@@ -34,73 +34,73 @@ it('doesn\'t meddle with inner formatting', () => {
 
 it('correctly spaces general rules', () => {
   return run(`
-a { color: #0f0; }
-strong { color: #f00; }
-em { font-weight: 400; }
+a { }
+strong { }
+em { }
 `, `
-a { color: #0f0; }
+a { }
 
-strong { color: #f00; }
+strong { }
 
-em { font-weight: 400; }
+em { }
 `);
 });
 
 it('avoids spacing related selectors', () => {
   return run(`
-.foo { padding: 1rem; }
-.foo li { margin: 0; }
+.foo { }
+.foo li { }
 `, `
-.foo { padding: 1rem; }
-.foo li { margin: 0; }
+.foo { }
+.foo li { }
 `);
 });
 
 it('avoids spacing a BEM element', () => {
   return run(`
-.block { padding: 1rem; background: #ccc; }
-.block__element { display: block; }
+.block { }
+.block__element { }
 `, `
-.block { padding: 1rem; background: #ccc; }
-.block__element { display: block; }
+.block { }
+.block__element { }
 `);
 });
 
 it('collapses spacing on a BEM element', () => {
   return run(`
-.block { padding: 1rem; background: #ccc; }
+.block { }
 
-.block__element { display: block; }
+.block__element { }
 `, `
-.block { padding: 1rem; background: #ccc; }
-.block__element { display: block; }
+.block { }
+.block__element { }
 `);
 });
 
 it('finds non-explicit BEM blocks', () => {
   return run(`
-div .block__foo { display: block; }
+div .block__foo { }
 
-.block__bar--baz strong { color: #f00; }
+.block__bar--baz strong { }
 `, `
-div .block__foo { display: block; }
-.block__bar--baz strong { color: #f00; }
+div .block__foo { }
+.block__bar--baz strong { }
 `);
 });
 
 it('handles conglomerate BEM blocks', () => {
   return run(`
 .block,
-.another-block { display: block; }
+.another-block { }
 
-.block__foo { color: #f00; }
+.block__foo { }
 
-.another-block__bar { padding: 1rem; }
+.another-block__bar { }
 `, `
 .block,
-.another-block { display: block; }
-.block__foo { color: #f00; }
-.another-block__bar { padding: 1rem; }
+.another-block { }
+.block__foo { }
+.another-block__bar { }
 `);
 });
 
@@ -113,7 +113,7 @@ it('doesn\'t mess with standard comments', () => {
 
 /* another comment */
 .bar {
-  display: block;  /* yet another comment */
+  color: #f00;  /* yet another comment */
 }
 `, `
 .foo {
@@ -123,23 +123,23 @@ it('doesn\'t mess with standard comments', () => {
 
 /* another comment */
 .bar {
-  display: block;  /* yet another comment */
+  color: #f00;  /* yet another comment */
 }
 `);
 });
 
 it('spaces section comments', () => {
   return run(`
-.foo { display: block; }
+.foo { }
 /* ---------- major section ---------- */
-.bar { display: block; }
+.bar { }
 `, `
-.foo { display: block; }
+.foo { }
 
 
 /* ---------- major section ---------- */
 
-.bar { display: block; }
+.bar { }
 `);
 });
 
@@ -148,75 +148,75 @@ it('correctly handles multiline comments', () => {
 /*
  * thing
  */
-.foo { display: block; }
+.foo { }
 /*
  * ---------- major thing ----------
  */
-.bar { display: block; }
+.bar { }
 `, `
 /*
  * thing
  */
-.foo { display: block; }
+.foo { }
 
 
 /*
  * ---------- major thing ----------
  */
 
-.bar { display: block; }
+.bar { }
 `);
 });
 
 it('spaces unrelated media queries before', () => {
   return run(`
-.foo { display: block; }
+.foo { }
 @media print {
-  .bar { display: none; }
+  .bar { }
 }
 `, `
-.foo { display: block; }
+.foo { }
 
 
 @media print {
-  .bar { display: none; }
+  .bar { }
 }
 `);
 });
 
 it('spaces BEM block media queries before', () => {
   return run(`
-.foo { display: block; }
+.foo { }
 @media print {
-  .foo__element { display: none; }
+  .foo__element { }
 }
 `, `
-.foo { display: block; }
+.foo { }
 
 @media print {
-  .foo__element { display: none; }
+  .foo__element { }
 }
 `);
 });
 
 it('spaces multiple BEM block media queries before', () => {
   return run(`
-.foo { display: block; }
+.foo { }
 @media print {
-  .foo__element { display: none; }
+  .foo__element { }
 }
 @media (min-width: 720px) {
-  .foo { background: #f00 }
+  .foo { }
 }
 `, `
-.foo { display: block; }
+.foo { }
 
 @media print {
-  .foo__element { display: none; }
+  .foo__element { }
 }
 
 @media (min-width: 720px) {
-  .foo { background: #f00 }
+  .foo { }
 }
 `);
 });
