@@ -190,7 +190,7 @@ A set of strings that, when found in a comment, mark that comment as a major sec
 
 Type: `boolean`, default: `false`
 
-Set to `true` in order to force the breaking of multiple selectors to new lines. This is the only time that Between will alter existing block formatting.
+Set to `true` in order to force the breaking of multiple selectors to new lines. This is the only time that Between will alter existing block formatting. Fills in a gap when used in conjunction with [perfectionist](https://www.npmjs.com/package/perfectionist).
 
 In:
 
