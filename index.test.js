@@ -14,9 +14,21 @@ it('runs', () => {
 });
 
 it('doesn\'t meddle with inner formatting', () => {
-  return run(
-    'a { font-weight:700;text-decoration:none }',
-    'a { font-weight:700;text-decoration:none }'
+  return run(`
+.foo { font-weight:700;text-decoration:none }
+
+.bar {
+    font-weight:700;
+  text-decoration:none;
+}
+`, `
+.foo { font-weight:700;text-decoration:none }
+
+.bar {
+    font-weight:700;
+  text-decoration:none;
+}
+`
   );
 });
 
