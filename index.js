@@ -65,7 +65,7 @@ module.exports = postcss.plugin('postcss-between', function (options) {
       // class/id/BEM roots
       for (let stem of selector.split(' ')) {
         if (stem.charAt(0) === '.' || stem.charAt(0) === '#') {
-          roots.add(stem.replace(/(__|\-\-).*$/, ''));
+          roots.add(stem.replace(/(__|\-\-|:|\[).*$/, ''));
         }
       }
       // plain elements, if not already handled by a class/id block

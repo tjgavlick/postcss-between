@@ -64,12 +64,17 @@ div { }
 div p { }
 a { }
 strong a { }
+p { }
+p.foo { }
 `, `
 div { }
 div p { }
 
 a { }
 strong a { }
+
+p { }
+p.foo { }
 `);
 });
 
@@ -77,9 +82,81 @@ it('groups related selectors by class', () => {
   return run(`
 .foo { }
 .foo li { }
+.bar { }
 `, `
 .foo { }
 .foo li { }
+
+.bar { }
+`);
+});
+
+it('groups similar selectors regardless of pseudoclass', () => {
+  return run(`
+a { }
+a:hover,
+a:focus { }
+input { }
+input:disabled { }
+.foo { }
+.foo:hover { }
+.bar:hover { }
+.bar { }
+`, `
+a { }
+a:hover,
+a:focus { }
+
+input { }
+input:disabled { }
+
+.foo { }
+.foo:hover { }
+
+.bar:hover { }
+.bar { }
+`);
+});
+
+it('groups similar selectors regardless of pseudoelement', () => {
+  return run(`
+div { }
+div::before { }
+.foo { }
+.foo::after { }
+input::-webkit-input-placeholder { }
+input::-moz-placeholder { }
+`, `
+div { }
+div::before { }
+
+.foo { }
+.foo::after { }
+
+input::-webkit-input-placeholder { }
+input::-moz-placeholder { }
+`);
+});
+
+it('groups similar selectors regardless of attribute selector', () => {
+  return run(`
+input { }
+input[type="search"] { }
+input[type="text"]:focus { }
+a { }
+a[href^="/"] { }
+.input[type="search"] { }
+.input { }
+`, `
+input { }
+input[type="search"] { }
+input[type="text"]:focus { }
+
+a { }
+a[href^="/"] { }
+
+.input[type="search"] { }
+.input { }
 `);
 });
 

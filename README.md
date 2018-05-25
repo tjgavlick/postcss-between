@@ -150,10 +150,8 @@ Out:
 ## TODO
 
 - Group additional related selectors:
-  - `a` with `a:hover, a:focus`, but not `.foo a` with `.bar a:hover`
-  - `input[type="text"]` with `input[type="text"]:focus`
-  - Pseudoelements
   - `h1` with `h2`, etc?
+  - make sure selector relationships (e.g. `+`, `~`) don't throw things off
 - Add aspects to options
 - Option to multiline selectors?
 
