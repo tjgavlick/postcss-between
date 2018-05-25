@@ -14,7 +14,7 @@ See [PostCSS] docs for examples for your environment.
 
 ## Examples
 
-Between will not apply any formatting to the declarations inside your CSS rules; it will only affect the spaces between blocks. Use it as the mastering to Prettier's mixing, for example.
+Between will not apply any formatting to the declarations inside your CSS rules; it will only affect the spaces between blocks. Use it as the mastering to [perfectionist](https://www.npmjs.com/package/perfectionist)'s mixing, for example. It also will not, obviously, sort or permute your blocks in any way.
 
 Spacing will be handled based on some *opinions*:
 
@@ -25,6 +25,9 @@ Spaces most selector blocks, but keeps related items together.
 In:
 
 ```css
+a {}
+a:hover, a:focus {}
+a[href^="/"] {}
 .foo {}
 .bar {}
 .bar a {}
@@ -33,6 +36,10 @@ In:
 Out:
 
 ```css
+a {}
+a:hover, a:focus {}
+a[href^="/"] {}
+
 .foo {}
 
 .bar {}
@@ -52,7 +59,7 @@ In:
 
 .another-block {}
 
-.another-block .foo {}
+.no-js .another-block .foo {}
 ```
 
 Out:
@@ -63,7 +70,7 @@ Out:
 .block__element--modifier {}
 
 .another-block {}
-.another-block .foo {}
+.no-js .another-block .foo {}
 ```
 
 ### Comments

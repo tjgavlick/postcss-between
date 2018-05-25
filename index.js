@@ -89,6 +89,11 @@ module.exports = postcss.plugin('postcss-between', (opts = {}) => {
     ).test(text);
   }
 
+  // adds newlines to raws.before, respecting initial selector indentation
+  function addSpaceBefore(before, count) {
+    return '\n'.repeat(count) + before.replace(/\n/g, '');
+  }
+
 
   return root => {
     var cachedRoots = [];
@@ -104,25 +109,25 @@ module.exports = postcss.plugin('postcss-between', (opts = {}) => {
         if (rule.prev().type === 'rule') {
           // is this rule is in the same BEM block?
           if (testRelated(cachedRoots, rule.selectors)) {
-            rule.raws.before = '\n';
+            rule.raws.before = addSpaceBefore(rule.raws.before, 1);
           } else {
-            rule.raws.before = '\n\n';
+            rule.raws.before = addSpaceBefore(rule.raws.before, 2);
             cachedRoots = generateRoots(rule.selectors);
           }
 
         // comment + rule
         } else if (rule.prev().type === 'comment' && testHeading(rule.prev().text)) {
-          rule.raws.before = '\n\n';
+          rule.raws.before = addSpaceBefore(rule.raws.before, 2);
           cachedRoots = generateRoots(rule.selectors);
 
         // @rule + rule
         } else if (rule.prev().type === 'atrule') {
           // if we're still in a BEM block, space conservatively
           if (testRelated(cachedRoots, rule.selectors)) {
-            rule.raws.before = '\n\n';
+            rule.raws.before = addSpaceBefore(rule.raws.before, 2);
           // otherwise, isolate the block
           } else {
-            rule.raws.before = '\n\n\n';
+            rule.raws.before = addSpaceBefore(rule.raws.before, 3);
             cachedRoots = generateRoots(rule.selectors);
           }
 
@@ -134,9 +139,9 @@ module.exports = postcss.plugin('postcss-between', (opts = {}) => {
 
       if (rule.type === 'comment') {
         // space major section headings
-        if (testHeading(rule.text)) {
-          rule.raws.before = '\n\n\n';
-          rule.after = '\n\n';
+        if (rule.prev() !== undefined && testHeading(rule.text)) {
+          rule.raws.before = addSpaceBefore(rule.raws.before, 3);
+          rule.after = addSpaceBefore(rule.raws.before, 2);
         }
       }
 
@@ -153,14 +158,14 @@ module.exports = postcss.plugin('postcss-between', (opts = {}) => {
             return acc;
           }, new Set()));
           if (testRelated(cachedRoots, innerSelectors)) {
-            rule.raws.before = '\n\n';
+            rule.raws.before = addSpaceBefore(rule.raws.before, 2);
           } else {
-            rule.raws.before = '\n\n\n';
+            rule.raws.before = addSpaceBefore(rule.raws.before, 3);
           }
 
         // if no children, isolate the @rule
         } else {
-          rule.raws.before = '\n\n\n';
+          rule.raws.before = addSpaceBefore(rule.raws.before, 3);
         }
       }
     });

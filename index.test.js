@@ -38,6 +38,24 @@ it('doesn\'t meddle with inner formatting', () => {
   );
 });
 
+it('doesn\'t meddle with selector indentation', () => {
+  return run(`
+.grid {}
+@media (min-width: 720px) {
+  .grid {}
+  .grid__unit {}
+}
+`, `
+.grid {}
+
+@media (min-width: 720px) {
+  .grid {}
+  .grid__unit {}
+}
+`
+  );
+});
+
 
 /*
  * selector rule spacing
