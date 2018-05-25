@@ -2,9 +2,21 @@
 
 (Upcoming) [PostCSS] plugin that handles spacing between blocks for a more readable stylesheet.
 
-Between will not apply any formatting to the declarations inside your CSS rules. It will only space blocks. Use it as the mastering to Prettier's mixing, for example.
+## Usage
 
-Between will space blocks based on some *opinions*:
+```js
+postcss([ require('postcss-between') ])
+```
+
+Use with Node 6 or greater.
+
+See [PostCSS] docs for examples for your environment.
+
+## Examples
+
+Between will not apply any formatting to the declarations inside your CSS rules; it will only affect the spaces between blocks. Use it as the mastering to Prettier's mixing, for example.
+
+Spacing will be handled based on some *opinions*:
 
 ### Selector blocks
 
@@ -152,11 +164,3 @@ Out:
 - Group additional related selectors:
   - `h1` with `h2`, etc?
 - Add aspects to options
-
-## Usage
-
-```js
-postcss([ require('postcss-between') ])
-```
-
-See [PostCSS] docs for examples for your environment.
