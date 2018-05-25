@@ -9,6 +9,12 @@ function run(input, output, opts) {
     });
 }
 
+
+/*
+ * barebones functionality
+ * -----------------------
+ */
+
 it('runs', () => {
   return run('a { }', 'a { }', {});
 });
@@ -31,6 +37,12 @@ it('doesn\'t meddle with inner formatting', () => {
 `
   );
 });
+
+
+/*
+ * selector rule spacing
+ * ---------------------
+ */
 
 it('correctly spaces general rules', () => {
   return run(`
@@ -59,10 +71,14 @@ it('avoids spacing related selectors', () => {
 it('avoids spacing a BEM element', () => {
   return run(`
 .block { }
+.block--modifier {}
 .block__element { }
+.block__element--modifier { }
 `, `
 .block { }
+.block--modifier {}
 .block__element { }
+.block__element--modifier { }
 `);
 });
 
@@ -77,13 +93,13 @@ it('collapses spacing on a BEM element', () => {
 `);
 });
 
-it('finds non-explicit BEM blocks', () => {
+it('finds non-explicit or nested BEM blocks', () => {
   return run(`
-div .block__foo { }
+.no-js .block__foo { }
 
 .block__bar--baz strong { }
 `, `
-div .block__foo { }
+.no-js .block__foo { }
 .block__bar--baz strong { }
 `);
 });
@@ -103,6 +119,12 @@ it('handles conglomerate BEM blocks', () => {
 .another-block__bar { }
 `);
 });
+
+
+/*
+ * comments
+ * --------
+ */
 
 it('doesn\'t mess with standard comments', () => {
   return run(`
@@ -167,6 +189,12 @@ it('correctly handles multiline comments', () => {
 .bar { }
 `);
 });
+
+
+/*
+ * @rules
+ * ------
+ */
 
 it('spaces unrelated media queries before', () => {
   return run(`

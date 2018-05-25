@@ -18,8 +18,8 @@ module.exports = postcss.plugin('postcss-between', function (options) {
     return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
   }
 
-  // determines if selectors belong to the same BEM block as the predicate
-  function testBem(predicates, selectors) {
+  // determines if selectors are related to the predicate
+  function testRelated(predicates, selectors) {
     if (!predicates ||
         !selectors ||
         predicates.length === 0 ||
@@ -27,7 +27,7 @@ module.exports = postcss.plugin('postcss-between', function (options) {
 
     for (let predicate of predicates) {
       for (let selector of selectors) {
-        if (selector.indexOf(predicate) >= 0) {
+        if (selector.indexOf(predicate) === 0) {
           return true;
         }
       }
@@ -36,12 +36,13 @@ module.exports = postcss.plugin('postcss-between', function (options) {
   }
 
   // reduces selectors to a set of bem roots
-  function generateBemRoots(selectors) {
+  function generateRoots(selectors) {
     let roots = new Set();
     for (let selector of selectors) {
       for (let stem of selector.split(' ')) {
+        // classes, trimming BEM blocks
         if (stem.charAt(0) === '.' || stem.charAt(0) === '#') {
-          roots.add(stem.replace(/__.*$/, ''));
+          roots.add(stem.replace(/(__|\-\-).*$/g, ''));
         }
       }
     }
@@ -64,39 +65,39 @@ module.exports = postcss.plugin('postcss-between', function (options) {
       if (rule.type === 'rule') {
         // no need to space above if it's the first rule
         if (rule.prev() === undefined) {
-          cachedBemRoots = generateBemRoots(rule.selectors);
+          cachedBemRoots = generateRoots(rule.selectors);
           return;
         }
 
         // rule + rule
         if (rule.prev().type === 'rule') {
           // is this rule is in the same BEM block?
-          if (testBem(cachedBemRoots, rule.selectors)) {
+          if (testRelated(cachedBemRoots, rule.selectors)) {
             rule.raws.before = '\n';
           } else {
             rule.raws.before = '\n\n';
-            cachedBemRoots = generateBemRoots(rule.selectors);
+            cachedBemRoots = generateRoots(rule.selectors);
           }
 
         // comment + rule
         } else if (rule.prev().type === 'comment' && testHeading(rule.prev().text)) {
           rule.raws.before = '\n\n';
-          cachedBemRoots = generateBemRoots(rule.selectors);
+          cachedBemRoots = generateRoots(rule.selectors);
 
         // @rule + rule
         } else if (rule.prev().type === 'atrule') {
           // if we're still in a BEM block, space conservatively
-          if (testBem(cachedBemRoots, rule.selectors)) {
+          if (testRelated(cachedBemRoots, rule.selectors)) {
             rule.raws.before = '\n\n';
           // otherwise, isolate the block
           } else {
             rule.raws.before = '\n\n\n';
-            cachedBemRoots = generateBemRoots(rule.selectors);
+            cachedBemRoots = generateRoots(rule.selectors);
           }
 
         // anything else + rule
         } else {
-          cachedBemRoots = generateBemRoots(rule.selectors);
+          cachedBemRoots = generateRoots(rule.selectors);
         }
       }
 
@@ -120,7 +121,7 @@ module.exports = postcss.plugin('postcss-between', function (options) {
             }
             return acc;
           }, new Set()));
-          if (testBem(cachedBemRoots, innerSelectors)) {
+          if (testRelated(cachedBemRoots, innerSelectors)) {
             rule.raws.before = '\n\n';
           } else {
             rule.raws.before = '\n\n\n';
