@@ -18,6 +18,15 @@ module.exports = postcss.plugin('postcss-between', (opts = {}) => {
     return selector.replace(/\+|~(?!=)|>/g, ' ').replace(/\s+/, ' ');
   }
 
+  function testWord(predicate, test, useBeginningOnly = false) {
+    let searchIndex = test.indexOf(predicate);
+    let nextChar = test.charAt(searchIndex + predicate.length);
+    if (useBeginningOnly) {
+      return searchIndex === 0 && !/[a-zA-Z]/.test(nextChar);
+    }
+    return searchIndex >= 0 && !/[a-zA-Z]/.test(nextChar);
+  }
+
   // determines if test selectors are related to predicate selectors
   function testRelated(predicates, selectors) {
     if (!predicates ||
@@ -40,7 +49,7 @@ module.exports = postcss.plugin('postcss-between', (opts = {}) => {
       selector = removeCombinators(selector);
       // class/id blocks
       for (let predicate of namedPredicates) {
-        if (selector.indexOf(predicate) >= 0) {
+        if (testWord(predicate, selector)) {
           return true;
         }
       }
@@ -49,7 +58,7 @@ module.exports = postcss.plugin('postcss-between', (opts = {}) => {
         let elements = selector.match(/^[a-zA-Z ]+/);
         if (elements) {
           for (let element of elements[0].split(' ')) {
-            if (element.indexOf(predicate) === 0) {
+            if (testWord(predicate, element, true)) {
               return true;
             }
           }
@@ -114,7 +123,7 @@ module.exports = postcss.plugin('postcss-between', (opts = {}) => {
 
         // rule + rule
         if (rule.prev().type === 'rule') {
-          // is this rule is in the same BEM block?
+          // is this rule in the same BEM block?
           if (testRelated(cachedRoots, rule.selectors)) {
             rule.raws.before = addSpaceBefore(rule.raws.before, 1);
           } else {
@@ -122,7 +131,7 @@ module.exports = postcss.plugin('postcss-between', (opts = {}) => {
             cachedRoots = generateRoots(rule.selectors);
           }
 
-        // comment + rule
+        // heading comment + rule
         } else if (rule.prev().type === 'comment' && testHeading(rule.prev().text)) {
           rule.raws.before = addSpaceBefore(rule.raws.before, 2);
           cachedRoots = generateRoots(rule.selectors);
@@ -148,7 +157,6 @@ module.exports = postcss.plugin('postcss-between', (opts = {}) => {
         // space major section headings
         if (rule.prev() !== undefined && testHeading(rule.text)) {
           rule.raws.before = addSpaceBefore(rule.raws.before, 3);
-          rule.after = addSpaceBefore(rule.raws.before, 2);
         }
       }
 

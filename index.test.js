@@ -178,6 +178,29 @@ a[href^="/"] { }
 `);
 });
 
+it('is not greedy', () => {
+  return run(`
+.foo { }
+.foobar { }
+a { }
+abbr { }
+.foobar { }
+.foo { }
+`, `
+.foo { }
+
+.foobar { }
+
+a { }
+
+abbr { }
+
+.foobar { }
+
+.foo { }
+`);
+});
+
 it('doesn\'t choke on element combinators', () => {
   return run(`
 .foo { }

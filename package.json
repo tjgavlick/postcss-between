@@ -29,6 +29,7 @@
   },
   "homepage": "https://github.com/tjgavlick/postcss-between",
   "dependencies": {
+    "npm": "^6.1.0",
     "postcss": "^6.0.16"
   },
   "devDependencies": {
@@ -46,8 +47,16 @@
       "es6": true
     },
     "rules": {
-      "indent": ["error", 2],
-      "max-len": ["error", { "code": 120 }],
+      "indent": [
+        "error",
+        2
+      ],
+      "max-len": [
+        "error",
+        {
+          "code": 120
+        }
+      ],
       "_comment": "constrain line length to about a github diff view"
     }
   },
