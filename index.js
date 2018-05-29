@@ -1,97 +1,126 @@
 const postcss = require('postcss');
 
+
+/**
+ * Escapes a string for insertion into a RegExp
+ * @param {string} str
+ */
+function escapeRegExp(str) {
+  return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+}
+
+/**
+ * Removes combinators from a selector string
+ * @param {string} selector
+ */
+function removeCombinators(selector) {
+  // replace combinators with a space in case author has spaced selector tightly
+  // e.g. li+li
+  return selector.replace(/\+|~(?!=)|>/g, ' ').replace(/\s+/, ' ');
+}
+
+/**
+ * Tests whether a particular identifier exists within a given CSS selector
+ * @param {string} selector - a CSS selector string
+ * @param {string} part - the identifier we're searching for
+ * @return {boolean} whether the part was found in the selector
+ */
+function testSelectorPart(selector, part) {
+  let searchIndex = selector.indexOf(part);
+  let nextChar = selector.charAt(searchIndex + part.length);
+  return searchIndex >= 0 && !/[a-zA-Z]/.test(nextChar);
+}
+
+/**
+ * Determines if a set of selectors is related to a predicate set
+ * @param {Array<string>} predicates - a set of predicate selector stems to test
+ *     against. A selector stem is a selector component without psuedoclasses,
+ *     attribute selectors, BEM extensions, and so on
+ * @param {Array<string>} selectors - an array of CSS selector strings
+ * @return {boolean} whether the selectors are related to the predicates
+ */
+function testRelatedSelectors(predicates, selectors) {
+  if (!predicates ||
+      !selectors ||
+      predicates.length === 0 ||
+      selectors.length === 0) return false;
+
+  // group predicates by named (classes, ids) and other
+  let namedPredicates = [];
+  let otherPredicates = [];
+  for (let predicate of predicates) {
+    if (predicate.charAt(0) === '.' || predicate.charAt(0) === '#') {
+      namedPredicates.push(predicate);
+    } else {
+      otherPredicates.push(predicate);
+    }
+  }
+
+  for (let selector of selectors) {
+    selector = removeCombinators(selector);
+    // class/id blocks
+    for (let predicate of namedPredicates) {
+      if (testSelectorPart(selector, predicate)) {
+        return true;
+      }
+    }
+    // other elements
+    for (let predicate of otherPredicates) {
+      let elements = selector.match(/^[a-zA-Z ]+/);
+      if (elements && testSelectorPart(elements[0], predicate)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+/**
+ * Reduces selectors to a set of selector stems
+ * @param {Array<string>} selectors - an array of CSS selector strings
+ * @return {Array<string>} an array of selector stems
+ */
+function generateSelectorStems(selectors) {
+  let stems = new Set();
+  for (let selector of selectors) {
+    selector = removeCombinators(selector);
+    // class/id/BEM stems
+    for (let stem of selector.split(' ')) {
+      if (stem.charAt(0) === '.' || stem.charAt(0) === '#') {
+        stems.add(stem.replace(/(__|\-\-|:|\[).*$/, ''));
+      }
+    }
+    // plain elements, if not already scoped to a class/id block
+    let elements = selector.match(/^[a-zA-Z ]+/);
+    if (elements) {
+      for (let element of elements[0].split(' ')) {
+        stems.add(element);
+      }
+    }
+  }
+  return Array.from(stems);
+}
+
+/**
+ * Adds newlines to postcss raws.before, respecting selector indentation
+ * @param {string} before - postcss raws.before value for a block
+ * @param {int} count - the number of newlines to add
+ * @return {string} amended postcss raws.before value
+ */
+function addSpaceBefore(before, count) {
+  return '\n'.repeat(count) + before.replace(/\n/g, '');
+}
+
+
 module.exports = postcss.plugin('postcss-between', (opts = {}) => {
   opts = Object.assign({
     breakMultipleSelectors: false,
     headingCommentIdentifiers: [ '---', '===', '___', '+++', '***']
   }, opts);
 
-  // escape a string for safe insertion into a RegExp
-  function escapeRegExp(str) {
-    return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-  }
-
-  // removes combinators from a selector
-  function removeCombinators(selector) {
-    // replace combinators with a space in case author has spaced selector tightly
-    // e.g. li+li
-    return selector.replace(/\+|~(?!=)|>/g, ' ').replace(/\s+/, ' ');
-  }
-
-  function testWord(predicate, test, useBeginningOnly = false) {
-    let searchIndex = test.indexOf(predicate);
-    let nextChar = test.charAt(searchIndex + predicate.length);
-    if (useBeginningOnly) {
-      return searchIndex === 0 && !/[a-zA-Z]/.test(nextChar);
-    }
-    return searchIndex >= 0 && !/[a-zA-Z]/.test(nextChar);
-  }
-
-  // determines if test selectors are related to predicate selectors
-  function testRelated(predicates, selectors) {
-    if (!predicates ||
-        !selectors ||
-        predicates.length === 0 ||
-        selectors.length === 0) return false;
-
-    // group predicates by named (classes, ids) and other
-    let namedPredicates = [];
-    let otherPredicates = [];
-    for (let predicate of predicates) {
-      if (predicate.charAt(0) === '.' || predicate.charAt(0) === '#') {
-        namedPredicates.push(predicate);
-      } else {
-        otherPredicates.push(predicate);
-      }
-    }
-
-    for (let selector of selectors) {
-      selector = removeCombinators(selector);
-      // class/id blocks
-      for (let predicate of namedPredicates) {
-        if (testWord(predicate, selector)) {
-          return true;
-        }
-      }
-      // other elements
-      for (let predicate of otherPredicates) {
-        let elements = selector.match(/^[a-zA-Z ]+/);
-        if (elements) {
-          for (let element of elements[0].split(' ')) {
-            if (testWord(predicate, element, true)) {
-              return true;
-            }
-          }
-        }
-      }
-    }
-    return false;
-  }
-
-  // reduces selectors to a set of bem roots
-  function generateRoots(selectors) {
-    let roots = new Set();
-    for (let selector of selectors) {
-      selector = removeCombinators(selector);
-      // class/id/BEM roots
-      for (let stem of selector.split(' ')) {
-        if (stem.charAt(0) === '.' || stem.charAt(0) === '#') {
-          roots.add(stem.replace(/(__|\-\-|:|\[).*$/, ''));
-        }
-      }
-      // plain elements, if not already handled by a class/id block
-      let elements = selector.match(/^[a-zA-Z ]+/);
-      if (elements) {
-        for (let element of elements[0].split(' ')) {
-          roots.add(element);
-        }
-      }
-    }
-    return Array.from(roots);
-  }
-
-  // determines if a given comment is a 'heading' comment
-  function testHeading(text) {
+  // Determines whether comment text matches one or more heading comment
+  // identifiers, as set in the plugin options
+  function testHeaderComment(text) {
     return new RegExp(
       opts.headingCommentIdentifiers
         .map(str => escapeRegExp(str))
@@ -99,17 +128,11 @@ module.exports = postcss.plugin('postcss-between', (opts = {}) => {
     ).test(text);
   }
 
-  // adds newlines to raws.before, respecting initial selector indentation
-  function addSpaceBefore(before, count) {
-    return '\n'.repeat(count) + before.replace(/\n/g, '');
-  }
-
-
   return root => {
     var cachedRoots = [];
     root.walk(rule => {
       if (rule.type === 'rule') {
-        // break multiple selectors to new lines
+        // break multiple selectors to new lines if requested
         if (opts.breakMultipleSelectors) {
           let indentation = rule.raws.before.replace(/^[\s\n]*\n/, '');
           rule.selector = rule.selector.replace(/\s*,\s*/g, ',\n' + indentation);
@@ -117,45 +140,45 @@ module.exports = postcss.plugin('postcss-between', (opts = {}) => {
 
         // no need to space above if it's the first rule
         if (rule.prev() === undefined) {
-          cachedRoots = generateRoots(rule.selectors);
+          cachedRoots = generateSelectorStems(rule.selectors);
           return;
         }
 
         // rule + rule
         if (rule.prev().type === 'rule') {
           // is this rule in the same BEM block?
-          if (testRelated(cachedRoots, rule.selectors)) {
+          if (testRelatedSelectors(cachedRoots, rule.selectors)) {
             rule.raws.before = addSpaceBefore(rule.raws.before, 1);
           } else {
             rule.raws.before = addSpaceBefore(rule.raws.before, 2);
-            cachedRoots = generateRoots(rule.selectors);
+            cachedRoots = generateSelectorStems(rule.selectors);
           }
 
         // heading comment + rule
-        } else if (rule.prev().type === 'comment' && testHeading(rule.prev().text)) {
+        } else if (rule.prev().type === 'comment' && testHeaderComment(rule.prev().text)) {
           rule.raws.before = addSpaceBefore(rule.raws.before, 2);
-          cachedRoots = generateRoots(rule.selectors);
+          cachedRoots = generateSelectorStems(rule.selectors);
 
-        // @rule + rule
+        // atrule + rule
         } else if (rule.prev().type === 'atrule') {
-          // if we're still in a BEM block, space conservatively
-          if (testRelated(cachedRoots, rule.selectors)) {
+          // if we're still in a related block, space conservatively
+          if (testRelatedSelectors(cachedRoots, rule.selectors)) {
             rule.raws.before = addSpaceBefore(rule.raws.before, 2);
           // otherwise, isolate the block
           } else {
             rule.raws.before = addSpaceBefore(rule.raws.before, 3);
-            cachedRoots = generateRoots(rule.selectors);
+            cachedRoots = generateSelectorStems(rule.selectors);
           }
 
         // anything else + rule
         } else {
-          cachedRoots = generateRoots(rule.selectors);
+          cachedRoots = generateSelectorStems(rule.selectors);
         }
       }
 
       if (rule.type === 'comment') {
         // space major section headings
-        if (rule.prev() !== undefined && testHeading(rule.text)) {
+        if (rule.prev() !== undefined && testHeaderComment(rule.text)) {
           rule.raws.before = addSpaceBefore(rule.raws.before, 3);
         }
       }
@@ -164,7 +187,7 @@ module.exports = postcss.plugin('postcss-between', (opts = {}) => {
         if (rule.prev() === undefined) return;
 
         if (rule.nodes.length > 0) {
-          // is this a part of a continuing BEM block?
+          // is this a part of a block of related selectors?
           let innerRules = rule.nodes.filter(node => node.type === 'rule');
           let innerSelectors = Array.from(innerRules.reduce((acc, cur) => {
             for (let selector of cur.selectors) {
@@ -172,13 +195,13 @@ module.exports = postcss.plugin('postcss-between', (opts = {}) => {
             }
             return acc;
           }, new Set()));
-          if (testRelated(cachedRoots, innerSelectors)) {
+          if (testRelatedSelectors(cachedRoots, innerSelectors)) {
             rule.raws.before = addSpaceBefore(rule.raws.before, 2);
           } else {
             rule.raws.before = addSpaceBefore(rule.raws.before, 3);
           }
 
-        // if no children, isolate the @rule
+        // if no children, isolate this block
         } else {
           rule.raws.before = addSpaceBefore(rule.raws.before, 3);
         }
