@@ -1,6 +1,13 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.2.0] - 2018-05-29
+### Added
+- Spacing between different types of blocks is now user-configurable via the plugin options
+
+### Fixed
+- Related selectors are now matched more accurately
+
 ## [0.1.1] - 2018-05-25
 ### Fixed
 - Between now respects the selector's initial indentation when creating new lines with `breakMultipleSelectors`

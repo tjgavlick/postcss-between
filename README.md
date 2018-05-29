@@ -3,16 +3,68 @@
 (Upcoming) [PostCSS] plugin that handles spacing between blocks for a more readable stylesheet.
 
 - [Usage](#usage)
-- [Examples](#examples)
 - [Options](#options)
+- [Examples](#examples)
 
 ## Usage
 
 ```js
-postcss([ require('postcss-between') ])
+const between = require('postcss-between');
+postcss([
+  between({
+    // options
+  })
+]);
 ```
 
 Use with Node 6 or greater. See [PostCSS] docs for examples for your environment.
+
+
+## Options
+
+### headingCommentIdentifiers
+
+Type: `Array` of `string`s
+
+Default: `[ '---', '===', '___', '+++', '***']`
+
+A set of strings that, when found in a comment, mark that comment as a major section heading.
+
+### breakMultipleSelectors
+
+Type: `boolean`
+Default: `false`
+
+Set to `true` in order to force the breaking of multiple selectors to new lines. This is the only time that Between will alter existing block formatting. Fills in a gap when used in conjunction with [perfectionist](https://www.npmjs.com/package/perfectionist).
+
+In:
+
+```css
+a:hover, a:focus {}
+```
+
+Out:
+
+```css
+a:hover,
+a:focus {}
+```
+
+### Spacing Options
+
+Types: `int`
+
+The amount of spacing that Between inserts is adjustable with these options. Each value corresponds to the number of blank lines that will be inserted at the given points.
+
+| Option | Default | Description |
+| --- | --- | --- |
+| **spaceRelatedRule** | `0` | rule + related rule; e.g. `.foo { }` and `.foo a { }` |
+| **spaceUnrelatedRule** | `1` | rule + unrelated rule; e.g. `.foo { }` and `.bar { }` |
+| **spaceHeadingBefore** | `2` | anything + heading comment |
+| **spaceHeadingAfter** | `1` | heading comment + rule |
+| **spaceRelatedAtRule** | `1` | rule or at-rule + related at-rule |
+| **spaceUnrelatedAtRule** | `1` | rule or at-rule + unrelated at-rule |
+
 
 ## Examples
 
@@ -167,53 +219,3 @@ Out:
 ```
 
 [PostCSS]: https://github.com/postcss/postcss
-
-
-## Options
-
-```js
-const between = require('postcss-between');
-postcss([
-  between({
-    // options
-  })
-]);
-```
-
-### headingCommentIdentifiers
-
-Type: `Array` of `string`s, default: `[ '---', '===', '___', '+++', '***']`
-
-A set of strings that, when found in a comment, mark that comment as a major section heading.
-
-### breakMultipleSelectors
-
-Type: `boolean`, default: `false`
-
-Set to `true` in order to force the breaking of multiple selectors to new lines. This is the only time that Between will alter existing block formatting. Fills in a gap when used in conjunction with [perfectionist](https://www.npmjs.com/package/perfectionist).
-
-In:
-
-```css
-a:hover, a:focus {}
-```
-
-Out:
-
-```css
-a:hover,
-a:focus {}
-```
-
-### Spacing Options
-
-Types: `int`
-
-The amount of spacing that Between inserts is adjustable with these options. Each value corresponds to the number of blank lines that will be inserted at the given points.
-
-- **spaceRelatedRule** (default: `0`) - rule + related rule; e.g. `.foo { }` and `.foo a { }`
-- **spaceUnrelatedRule** (default: `1`) - rule + unrelated rule; e.g. `.foo { }` and `.bar { }`
-- **spaceHeadingBefore** (default: `2`) - anything + heading comment
-- **spaceHeadingAfter** (default: `1`) - heading comment + rule
-- **spaceRelatedAtRule** (default: `1`) - rule or at-rule + related at-rule
-- **spaceUnrelatedAtRule** (default: `1`) - rule or at-rule + unrelated at-rule
