@@ -462,10 +462,27 @@ it('isolates empty @rules', () => {
 
 
 /*
+ * heading comment identifiers option
+ * ----------------------------------
+ */
+
+it('respects the heading comment identifiers option', () => {
+  return run(`
+.foo {}
+/* ---------- not a heading ---------- */
+.bar {}
+`, `
+.foo {}
+/* ---------- not a heading ---------- */
+.bar {}
+`, { headingCommentIdentifiers: ['==='] });
+});
+
+
+/*
  * selector newline option
  * -----------------------
  */
-
 
 it('retains existing selectors by default', () => {
   return run(`
@@ -522,4 +539,71 @@ it('preserves initial selector indentation when breaking', () => {
   button:focus {}
 }
 `, { breakMultipleSelectors: true });
+});
+
+
+/*
+ * rule spacing options
+ * --------------------
+ */
+
+it('respects rule spacing options', () => {
+  return run(`
+.foo {}
+.foo a {}
+.bar {}
+`, `
+.foo {}
+
+
+.foo a {}
+
+
+
+.bar {}
+`, { spaceRelatedRule: 2, spaceUnrelatedRule: 3 });
+});
+
+it('respects heading spacing options', () => {
+  return run(`
+.foo {}
+/* ---------- heading comment ---------- */
+.bar {}
+`, `
+.foo {}
+/* ---------- heading comment ---------- */
+
+
+.bar {}
+`, { spaceHeadingBefore: 0, spaceHeadingAfter: 2 });
+});
+
+it('respects at-rule spacing options', () => {
+  return run(`
+.foo {}
+@media (min-width: 720px) {
+  .foo {}
+}
+.foo {}
+@media (min-width: 720px) {
+  .bar {}
+}
+.baz {}
+`, `
+.foo {}
+@media (min-width: 720px) {
+  .foo {}
+}
+.foo {}
+
+
+
+@media (min-width: 720px) {
+  .bar {}
+}
+
+
+
+.baz {}
+`, { spaceRelatedAtRule: 0, spaceUnrelatedAtRule: 3 });
 });

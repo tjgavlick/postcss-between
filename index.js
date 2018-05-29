@@ -104,16 +104,22 @@ function generateSelectorStems(selectors) {
 /**
  * Adds newlines to postcss raws.before, respecting selector indentation
  * @param {string} before - postcss raws.before value for a block
- * @param {int} count - the number of newlines to add
+ * @param {int} count - the number of blank lines to add
  * @return {string} amended postcss raws.before value
  */
-function addSpaceBefore(before, count) {
-  return '\n'.repeat(count) + before.replace(/\n/g, '');
+function addNewlinesBefore(before, count) {
+  return '\n'.repeat(count + 1) + before.replace(/\n/g, '');
 }
 
 
 module.exports = postcss.plugin('postcss-between', (opts = {}) => {
   opts = Object.assign({
+    spaceRelatedRule: 0,
+    spaceUnrelatedRule: 1,
+    spaceHeadingBefore: 2,
+    spaceHeadingAfter: 1,
+    spaceRelatedAtRule: 1,
+    spaceUnrelatedAtRule: 2,
     breakMultipleSelectors: false,
     headingCommentIdentifiers: [ '---', '===', '___', '+++', '***']
   }, opts);
@@ -148,25 +154,25 @@ module.exports = postcss.plugin('postcss-between', (opts = {}) => {
         if (rule.prev().type === 'rule') {
           // is this rule in the same BEM block?
           if (testRelatedSelectors(cachedRoots, rule.selectors)) {
-            rule.raws.before = addSpaceBefore(rule.raws.before, 1);
+            rule.raws.before = addNewlinesBefore(rule.raws.before, opts.spaceRelatedRule);
           } else {
-            rule.raws.before = addSpaceBefore(rule.raws.before, 2);
+            rule.raws.before = addNewlinesBefore(rule.raws.before, opts.spaceUnrelatedRule);
             cachedRoots = generateSelectorStems(rule.selectors);
           }
 
         // heading comment + rule
         } else if (rule.prev().type === 'comment' && testHeaderComment(rule.prev().text)) {
-          rule.raws.before = addSpaceBefore(rule.raws.before, 2);
+          rule.raws.before = addNewlinesBefore(rule.raws.before, opts.spaceHeadingAfter);
           cachedRoots = generateSelectorStems(rule.selectors);
 
         // atrule + rule
         } else if (rule.prev().type === 'atrule') {
           // if we're still in a related block, space conservatively
           if (testRelatedSelectors(cachedRoots, rule.selectors)) {
-            rule.raws.before = addSpaceBefore(rule.raws.before, 2);
+            rule.raws.before = addNewlinesBefore(rule.raws.before, opts.spaceRelatedAtRule);
           // otherwise, isolate the block
           } else {
-            rule.raws.before = addSpaceBefore(rule.raws.before, 3);
+            rule.raws.before = addNewlinesBefore(rule.raws.before, opts.spaceUnrelatedAtRule);
             cachedRoots = generateSelectorStems(rule.selectors);
           }
 
@@ -179,7 +185,7 @@ module.exports = postcss.plugin('postcss-between', (opts = {}) => {
       if (rule.type === 'comment') {
         // space major section headings
         if (rule.prev() !== undefined && testHeaderComment(rule.text)) {
-          rule.raws.before = addSpaceBefore(rule.raws.before, 3);
+          rule.raws.before = addNewlinesBefore(rule.raws.before, opts.spaceHeadingBefore);
         }
       }
 
@@ -196,14 +202,14 @@ module.exports = postcss.plugin('postcss-between', (opts = {}) => {
             return acc;
           }, new Set()));
           if (testRelatedSelectors(cachedRoots, innerSelectors)) {
-            rule.raws.before = addSpaceBefore(rule.raws.before, 2);
+            rule.raws.before = addNewlinesBefore(rule.raws.before, opts.spaceRelatedAtRule);
           } else {
-            rule.raws.before = addSpaceBefore(rule.raws.before, 3);
+            rule.raws.before = addNewlinesBefore(rule.raws.before, opts.spaceUnrelatedAtRule);
           }
 
         // if no children, isolate this block
         } else {
-          rule.raws.before = addSpaceBefore(rule.raws.before, 3);
+          rule.raws.before = addNewlinesBefore(rule.raws.before, opts.spaceUnrelatedAtRule);
         }
       }
     });

@@ -204,3 +204,16 @@ Out:
 a:hover,
 a:focus {}
 ```
+
+### Spacing Options
+
+Types: `int`
+
+The amount of spacing that Between inserts is adjustable with these options. Each value corresponds to the number of blank lines that will be inserted at the given points.
+
+- **spaceRelatedRule** (default: `0`) - rule + related rule; e.g. `.foo { }` and `.foo a { }`
+- **spaceUnrelatedRule** (default: `1`) - rule + unrelated rule; e.g. `.foo { }` and `.bar { }`
+- **spaceHeadingBefore** (default: `2`) - anything + heading comment
+- **spaceHeadingAfter** (default: `1`) - heading comment + rule
+- **spaceRelatedAtRule** (default: `1`) - rule or at-rule + related at-rule
+- **spaceUnrelatedAtRule** (default: `1`) - rule or at-rule + unrelated at-rule
