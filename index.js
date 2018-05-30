@@ -126,13 +126,14 @@ module.exports = postcss.plugin('postcss-between', (opts = {}) => {
 
   // Determines whether comment text matches one or more heading comment
   // identifiers, as set in the plugin options
-  function testHeaderComment(text) {
-    return new RegExp(
+  const testHeadingComment = (() => {
+    const headingRegExp = new RegExp(
       opts.headingCommentIdentifiers
         .map(str => escapeRegExp(str))
         .join('|')
-    ).test(text);
-  }
+    );
+    return text => headingRegExp.test(text);
+  })();
 
   return root => {
     var cachedRoots = [];
@@ -161,7 +162,7 @@ module.exports = postcss.plugin('postcss-between', (opts = {}) => {
           }
 
         // heading comment + rule
-        } else if (rule.prev().type === 'comment' && testHeaderComment(rule.prev().text)) {
+        } else if (rule.prev().type === 'comment' && testHeadingComment(rule.prev().text)) {
           rule.raws.before = addNewlinesBefore(rule.raws.before, opts.spaceHeadingAfter);
           cachedRoots = generateSelectorStems(rule.selectors);
 
@@ -184,7 +185,7 @@ module.exports = postcss.plugin('postcss-between', (opts = {}) => {
 
       if (rule.type === 'comment') {
         // space major section headings
-        if (rule.prev() !== undefined && testHeaderComment(rule.text)) {
+        if (rule.prev() !== undefined && testHeadingComment(rule.text)) {
           rule.raws.before = addNewlinesBefore(rule.raws.before, opts.spaceHeadingBefore);
         }
       }
