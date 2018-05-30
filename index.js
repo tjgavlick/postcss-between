@@ -127,6 +127,11 @@ module.exports = postcss.plugin('postcss-between', (opts = {}) => {
   // Determines whether comment text matches one or more heading comment
   // identifiers, as set in the plugin options
   const testHeadingComment = (() => {
+    // if no identifiers are set, every call should return false
+    if (!opts.headingCommentIdentifiers ||
+        opts.headingCommentIdentifiers.length === 0) {
+      return () => false;
+    }
     const headingRegExp = new RegExp(
       opts.headingCommentIdentifiers
         .map(str => escapeRegExp(str))

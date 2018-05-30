@@ -1,6 +1,8 @@
 # Between [![Build Status](https://travis-ci.org/tjgavlick/postcss-between.svg?branch=master)](https://travis-ci.org/tjgavlick/postcss-between)
 
-(Upcoming) [PostCSS] plugin that handles spacing between blocks for a more readable stylesheet.
+[PostCSS] plugin that handles spacing between blocks for a more readable stylesheet.
+
+Between will only affect the spaces between blocks; selector and in-rule formatting/ordering will remain untouched. Use it as the mastering to [perfectionist](https://www.npmjs.com/package/perfectionist)'s mixing, for example.
 
 - [Usage](#usage)
 - [Options](#options)
@@ -19,8 +21,22 @@ postcss([
 
 Use with Node 6 or greater. See [PostCSS] docs for examples for your environment.
 
-
 ## Options
+
+### Spacing
+
+Types: `int`
+
+The amount of spacing between different combinations of blocks is adjustable using these options. Each value corresponds to the number of blank lines that will be baked out at the given points.
+
+| Option | Default | Description |
+| --- | --- | --- |
+| **spaceRelatedRule** | `0` | rule + related rule; e.g. `.foo { }` followed by `.foo a { }` |
+| **spaceUnrelatedRule** | `1` | rule + unrelated rule; e.g. `.foo { }` followed by `.bar { }` |
+| **spaceHeadingBefore** | `2` | anything + heading comment |
+| **spaceHeadingAfter** | `1` | heading comment + rule |
+| **spaceRelatedAtRule** | `1` | rule or at-rule + related at-rule |
+| **spaceUnrelatedAtRule** | `1` | rule or at-rule + unrelated at-rule |
 
 ### headingCommentIdentifiers
 
@@ -28,11 +44,12 @@ Type: `Array` of `string`s
 
 Default: `[ '---', '===', '___', '+++', '***']`
 
-A set of strings that, when found in a comment, mark that comment as a major section heading.
+A set of strings that, when found in a comment, mark that comment as a major section heading, which is then spaced accordingly. The spacing of all other comments will remain untouched. To never mark any comments as headings, pass an empty array literal — `[]` — or `null`.
 
 ### breakMultipleSelectors
 
 Type: `boolean`
+
 Default: `false`
 
 Set to `true` in order to force the breaking of multiple selectors to new lines. This is the only time that Between will alter existing block formatting. Fills in a gap when used in conjunction with [perfectionist](https://www.npmjs.com/package/perfectionist).
@@ -50,27 +67,7 @@ a:hover,
 a:focus {}
 ```
 
-### Spacing Options
-
-Types: `int`
-
-The amount of spacing that Between inserts is adjustable with these options. Each value corresponds to the number of blank lines that will be inserted at the given points.
-
-| Option | Default | Description |
-| --- | --- | --- |
-| **spaceRelatedRule** | `0` | rule + related rule; e.g. `.foo { }` and `.foo a { }` |
-| **spaceUnrelatedRule** | `1` | rule + unrelated rule; e.g. `.foo { }` and `.bar { }` |
-| **spaceHeadingBefore** | `2` | anything + heading comment |
-| **spaceHeadingAfter** | `1` | heading comment + rule |
-| **spaceRelatedAtRule** | `1` | rule or at-rule + related at-rule |
-| **spaceUnrelatedAtRule** | `1` | rule or at-rule + unrelated at-rule |
-
-
 ## Examples
-
-Between will not apply any formatting to the declarations inside your CSS rules; it will only affect the spaces between blocks. Use it as the mastering to [perfectionist](https://www.npmjs.com/package/perfectionist)'s mixing, for example. It also will not, obviously, sort or permute your blocks in any way.
-
-Spacing will be handled based on some *opinions*:
 
 ### Selector blocks
 
