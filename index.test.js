@@ -277,6 +277,19 @@ it('handles conglomerate BEM blocks', () => {
 `);
 });
 
+it('doesn\'t mistakenly identify word delimiters as BEM', () => {
+  return run(`
+.foo-bar { }
+.foo-baz { }
+.foo-baz__element { }
+`, `
+.foo-bar { }
+
+.foo-baz { }
+.foo-baz__element { }
+`);
+});
+
 
 /*
  * comments
