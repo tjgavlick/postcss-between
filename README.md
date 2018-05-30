@@ -36,7 +36,7 @@ The amount of spacing between different combinations of blocks is adjustable usi
 | **spaceHeadingBefore** | `2` | anything + heading comment |
 | **spaceHeadingAfter** | `1` | heading comment + rule |
 | **spaceRelatedAtRule** | `1` | rule or at-rule + related at-rule |
-| **spaceUnrelatedAtRule** | `1` | rule or at-rule + unrelated at-rule |
+| **spaceUnrelatedAtRule** | `2` | rule or at-rule + unrelated at-rule |
 
 ### headingCommentIdentifiers
 
