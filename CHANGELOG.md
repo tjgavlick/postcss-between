@@ -1,6 +1,15 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.2.1] - 2018-06-01
+### Fixed
+- Grouping test was overeager in matching certain elements and is now more accurate
+- Default for `spaceUnrelatedRule` was incorrect in documentation
+
+### Changed
+- Users can now pass an empty array or falsy value for `headingCommentIdentifiers` in order to mark no comments as headings
+- Improved performance of heading comment test
+
 ## [0.2.0] - 2018-05-29
 ### Added
 - Spacing between different types of blocks is now user-configurable via the plugin options
