@@ -1,4 +1,4 @@
-# Between [![Build Status](https://travis-ci.org/tjgavlick/postcss-between.svg?branch=master)](https://travis-ci.org/tjgavlick/postcss-between)
+# Between [![Build Status](https://travis-ci.org/tjgavlick/postcss-between.svg?branch=master)](https://travis-ci.org/tjgavlick/postcss-between) [![npm version](https://badge.fury.io/js/postcss-between.svg)](https://badge.fury.io/js/postcss-between)
 
 [PostCSS] plugin that handles spacing between blocks for a more readable stylesheet.
 
