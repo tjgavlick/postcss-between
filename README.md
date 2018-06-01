@@ -10,6 +10,10 @@ Between will only affect the spaces between blocks; selector and in-rule formatt
 
 ## Usage
 
+```bash
+npm install postcss-between
+```
+
 ```js
 const between = require('postcss-between');
 postcss([

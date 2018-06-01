@@ -23,11 +23,17 @@
   ],
   "author": "tjgavlick <8879532+tjgavlick@users.noreply.github.com>",
   "license": "MIT",
-  "repository": "tjgavlick/postcss-between",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tjgavlick/postcss-between.git"
+  },
   "bugs": {
     "url": "https://github.com/tjgavlick/postcss-between/issues"
   },
   "homepage": "https://github.com/tjgavlick/postcss-between",
+  "engines": {
+    "node": ">=6.0.0"
+  },
   "dependencies": {
     "npm": "^6.1.0",
     "postcss": "^6.0.16"
