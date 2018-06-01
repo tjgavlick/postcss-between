@@ -26,9 +26,27 @@ function removeCombinators(selector) {
  * @return {boolean} whether the part was found in the selector
  */
 function testSelectorPart(selector, part) {
-  let searchIndex = selector.indexOf(part);
-  let nextChar = selector.charAt(searchIndex + part.length);
-  return searchIndex >= 0 && !/[a-zA-Z]/.test(nextChar);
+  const searchIndex = selector.indexOf(part);
+  let nextChar, secondNextChar;
+
+  if (searchIndex === -1) return false;
+
+  nextChar = selector.charAt(searchIndex + part.length);
+  secondNextChar = selector.charAt(searchIndex + part.length + 1);
+
+  // search ahead to make sure we're not too eager in giving a positive match
+  if (nextChar) {
+    // next character should not be any letter
+    if (/[a-zA-Z]/.test(nextChar)) {
+      return false;
+    }
+    // if the next character /could/ be a BEM attachment, make sure it is
+    if (/[\-_]/.test(nextChar) && nextChar !== secondNextChar) {
+      return false;
+    }
+  }
+  // those conditions satisfied, consider other matches valid
+  return true;
 }
 
 /**

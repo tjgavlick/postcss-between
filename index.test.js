@@ -282,11 +282,20 @@ it('doesn\'t mistakenly identify word delimiters as BEM', () => {
 .foo-bar { }
 .foo-baz { }
 .foo-baz__element { }
+.foo-baz_not-an-element { }
+.foo { }
+.foo-_bad-bem { }
 `, `
 .foo-bar { }
 
 .foo-baz { }
 .foo-baz__element { }
+
+.foo-baz_not-an-element { }
+
+.foo { }
+
+.foo-_bad-bem { }
 `);
 });
 
