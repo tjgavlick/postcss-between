@@ -1,6 +1,9 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.0] - 2018-06-07
+- Stable API
+
 ## [0.2.1] - 2018-06-01
 ### Fixed
 - Grouping test was overeager in matching certain elements and is now more accurate
