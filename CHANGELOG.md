@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.1] - 2018-11-05
+### Fixed
+- Bumped dependency versions to get away from a security vulnerability in `merge`
+
 ## [1.0.0] - 2018-06-07
 - Stable API
 

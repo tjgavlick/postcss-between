@@ -1,6 +1,6 @@
 {
   "name": "postcss-between",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "PostCSS plugin that handles spacing between blocks for a more readable stylesheet",
   "keywords": [
     "postcss",
