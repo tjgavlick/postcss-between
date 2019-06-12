@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.2] - 2019-06-11
+### Fixed
+- Bumped dependency versions for `tar` and `fstream`. Now passes `npm audit` with 0 vulnerabilities
+
 ## [1.0.1] - 2018-11-05
 ### Fixed
 - Bumped dependency versions to get away from a security vulnerability in `merge`
