@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.3] - 2019-11-02
+### Fixed
+- Used fixed https-proxy-agent as a dev dependency
+
 ## [1.0.2] - 2019-06-11
 ### Fixed
 - Bumped dependency versions for `tar` and `fstream`. Now passes `npm audit` with 0 vulnerabilities
