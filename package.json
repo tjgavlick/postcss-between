@@ -1,6 +1,6 @@
 {
   "name": "postcss-between",
-  "version": "0.2.0",
+  "version": "1.0.2",
   "description": "PostCSS plugin that handles spacing between blocks for a more readable stylesheet",
   "keywords": [
     "postcss",
@@ -23,11 +23,17 @@
   ],
   "author": "tjgavlick <8879532+tjgavlick@users.noreply.github.com>",
   "license": "MIT",
-  "repository": "tjgavlick/postcss-between",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tjgavlick/postcss-between.git"
+  },
   "bugs": {
     "url": "https://github.com/tjgavlick/postcss-between/issues"
   },
   "homepage": "https://github.com/tjgavlick/postcss-between",
+  "engines": {
+    "node": ">=6.0.0"
+  },
   "dependencies": {
     "npm": "^6.12.1",
     "postcss": "^6.0.16"
@@ -42,7 +48,6 @@
     "test": "jest --coverage && eslint *.js"
   },
   "eslintConfig": {
-    "extends": "eslint-config-postcss/es5",
     "env": {
       "jest": true,
       "es6": true

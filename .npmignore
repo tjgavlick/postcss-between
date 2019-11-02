@@ -2,9 +2,22 @@
 .gitignore
 .editorconfig
 
-node_modules/
-npm-debug.log
+# packages
 yarn.lock
 
+# tests/ci
 *.test.js
 .travis.yml
+coverage
+
+# os crud
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# logs
+logs
+*.log
+yarn-debug.log*
+yarn-error.log*

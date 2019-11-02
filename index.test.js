@@ -277,6 +277,28 @@ it('handles conglomerate BEM blocks', () => {
 `);
 });
 
+it('doesn\'t mistakenly identify word delimiters as BEM', () => {
+  return run(`
+.foo-bar { }
+.foo-baz { }
+.foo-baz__element { }
+.foo-baz_not-an-element { }
+.foo { }
+.foo-_bad-bem { }
+`, `
+.foo-bar { }
+
+.foo-baz { }
+.foo-baz__element { }
+
+.foo-baz_not-an-element { }
+
+.foo { }
+
+.foo-_bad-bem { }
+`);
+});
+
 
 /*
  * comments
@@ -476,6 +498,46 @@ it('respects the heading comment identifiers option', () => {
 /* ---------- not a heading ---------- */
 .bar {}
 `, { headingCommentIdentifiers: ['==='] });
+});
+
+it('allows the user to mark no comments as major headings with an empty array', () => {
+  return run(`
+.foo {}
+/* ---------- not a heading ---------- */
+.bar {}
+/* not a heading */
+.baz {}
+/* */
+.foobar {}
+`, `
+.foo {}
+/* ---------- not a heading ---------- */
+.bar {}
+/* not a heading */
+.baz {}
+/* */
+.foobar {}
+`, { headingCommentIdentifiers: [] });
+});
+
+it('allows the user to mark no comments as major headings with a falsy value', () => {
+  return run(`
+.foo {}
+/* ---------- not a heading ---------- */
+.bar {}
+/* not a heading */
+.baz {}
+/* */
+.foobar {}
+`, `
+.foo {}
+/* ---------- not a heading ---------- */
+.bar {}
+/* not a heading */
+.baz {}
+/* */
+.foobar {}
+`, { headingCommentIdentifiers: null });
 });
 
 

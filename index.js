@@ -26,9 +26,27 @@ function removeCombinators(selector) {
  * @return {boolean} whether the part was found in the selector
  */
 function testSelectorPart(selector, part) {
-  let searchIndex = selector.indexOf(part);
-  let nextChar = selector.charAt(searchIndex + part.length);
-  return searchIndex >= 0 && !/[a-zA-Z]/.test(nextChar);
+  const searchIndex = selector.indexOf(part);
+  let nextChar, secondNextChar;
+
+  if (searchIndex === -1) return false;
+
+  nextChar = selector.charAt(searchIndex + part.length);
+  secondNextChar = selector.charAt(searchIndex + part.length + 1);
+
+  // search ahead to make sure we're not too eager in giving a positive match
+  if (nextChar) {
+    // next character should not be any letter
+    if (/[a-zA-Z]/.test(nextChar)) {
+      return false;
+    }
+    // if the next character /could/ be a BEM attachment, make sure it is
+    if (/[\-_]/.test(nextChar) && nextChar !== secondNextChar) {
+      return false;
+    }
+  }
+  // those conditions satisfied, consider other matches valid
+  return true;
 }
 
 /**
@@ -126,13 +144,19 @@ module.exports = postcss.plugin('postcss-between', (opts = {}) => {
 
   // Determines whether comment text matches one or more heading comment
   // identifiers, as set in the plugin options
-  function testHeaderComment(text) {
-    return new RegExp(
+  const testHeadingComment = (() => {
+    // if no identifiers are set, every call should return false
+    if (!opts.headingCommentIdentifiers ||
+        opts.headingCommentIdentifiers.length === 0) {
+      return () => false;
+    }
+    const headingRegExp = new RegExp(
       opts.headingCommentIdentifiers
         .map(str => escapeRegExp(str))
         .join('|')
-    ).test(text);
-  }
+    );
+    return text => headingRegExp.test(text);
+  })();
 
   return root => {
     var cachedRoots = [];
@@ -161,7 +185,7 @@ module.exports = postcss.plugin('postcss-between', (opts = {}) => {
           }
 
         // heading comment + rule
-        } else if (rule.prev().type === 'comment' && testHeaderComment(rule.prev().text)) {
+        } else if (rule.prev().type === 'comment' && testHeadingComment(rule.prev().text)) {
           rule.raws.before = addNewlinesBefore(rule.raws.before, opts.spaceHeadingAfter);
           cachedRoots = generateSelectorStems(rule.selectors);
 
@@ -184,7 +208,7 @@ module.exports = postcss.plugin('postcss-between', (opts = {}) => {
 
       if (rule.type === 'comment') {
         // space major section headings
-        if (rule.prev() !== undefined && testHeaderComment(rule.text)) {
+        if (rule.prev() !== undefined && testHeadingComment(rule.text)) {
           rule.raws.before = addNewlinesBefore(rule.raws.before, opts.spaceHeadingBefore);
         }
       }
