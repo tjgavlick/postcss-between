@@ -23,7 +23,7 @@ postcss([
 ]);
 ```
 
-Use with Node 6 or greater. See [PostCSS] docs for examples for your environment.
+Use with Node 8 or greater. See [PostCSS] docs for examples for your environment.
 
 ## Options
 
