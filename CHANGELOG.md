@@ -1,6 +1,13 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.4] - 2019-11-16
+### Changed
+- Minimum Node version is now 8 due to dependencies' support
+
+### Fixed
+- No longer lists npm as a dependency (it's instead an engine), thus removing a lingering audit vulnerability. Now passes `npm audit` with 0 vulnerabilities
+
 ## [1.0.3] - 2019-11-02
 ### Fixed
 - Used fixed https-proxy-agent as a dev dependency
