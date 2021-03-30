@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.5] - 2021-03-30
+### Changed
+- Bumped deps to address security vulnerabilities; passes `npm audit` at time of writing
+
 ## [1.0.4] - 2019-11-16
 ### Changed
 - Minimum Node version is now 8 due to dependencies' support
