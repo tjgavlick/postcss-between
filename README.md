@@ -2,7 +2,44 @@
 
 [PostCSS] plugin that handles spacing between blocks for a more readable stylesheet.
 
-Between will only affect the spaces between blocks; selector and in-rule formatting/ordering will remain untouched. Use it as the mastering to [perfectionist](https://www.npmjs.com/package/perfectionist)'s mixing, for example.
+Working with someone with no build tools? Client wants access to the stylesheet after the build's done? Need plain CSS to track in-CMS? Make it a bit easier to scan:
+
+```css
+a {}
+
+a:hover, a:focus {}
+
+a[href^="/"] {}
+/* ---------- Foo and Bar ---------- */
+.foo {}
+
+
+.foo__bar {}
+
+.baz {}
+
+.baz img {}
+```
+
+Yields:
+
+```css
+a {}
+a:hover,
+a:focus {}
+a[href^="/"] {}
+
+
+/* ---------- Foo and Bar ---------- */
+
+.foo {}
+.foo__bar {}
+
+.baz {}
+.baz img {}
+```
+
+Between will only affect the spaces between blocks; selector and in-rule formatting/ordering will remain untouched (with one opt-in exception; see `breakMultipleSelectors` below). Use it as the mastering to [perfectionist](https://www.npmjs.com/package/perfectionist)'s mixing, for example.
 
 - [Usage](#usage)
 - [Options](#options)
