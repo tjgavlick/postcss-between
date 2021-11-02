@@ -36,12 +36,7 @@
     "npm": ">=6.13.0"
   },
   "dependencies": {
-    "postcss": "^6.0.16"
-  },
-  "devDependencies": {
-    "eslint": "^4.18.2",
-    "eslint-config-postcss": "^2.0.2",
-    "jest": "^25.0.0"
+    "postcss": "^8.3.11"
   },
   "scripts": {
     "test": "jest --coverage && eslint *.js"
@@ -61,11 +56,15 @@
         {
           "code": 120
         }
-      ],
-      "_comment": "constrain line length to about a github diff view"
+      ]
     }
   },
   "jest": {
     "testEnvironment": "node"
+  },
+  "devDependencies": {
+    "eslint": "^8.1.0",
+    "eslint-config-postcss": "^4.0.0",
+    "jest": "^27.3.1"
   }
 }
