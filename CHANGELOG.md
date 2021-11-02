@@ -1,6 +1,12 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.6] - 2021-11-02
+### Changed
+- Allow for npm versions > 6
+- Bump deps to pass `npm audit`
+- Remove "comment" field from package.json to make eslint happy
+
 ## [1.0.5] - 2021-03-30
 ### Changed
 - Bumped deps to address security vulnerabilities; passes `npm audit` at time of writing
