@@ -33,7 +33,7 @@
   "homepage": "https://github.com/tjgavlick/postcss-between",
   "engines": {
     "node": ">=8.0.0",
-    "npm": "^6.13.0"
+    "npm": ">=6.13.0"
   },
   "dependencies": {
     "postcss": "^6.0.16"
