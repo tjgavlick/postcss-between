@@ -1,6 +1,3 @@
-const postcss = require('postcss');
-
-
 /**
  * Escapes a string for insertion into a RegExp
  * @param {string} str
@@ -130,7 +127,7 @@ function addNewlinesBefore(before, count) {
 }
 
 
-module.exports = postcss.plugin('postcss-between', (opts = {}) => {
+module.exports = (opts = {}) => {
   opts = Object.assign({
     spaceRelatedRule: 0,
     spaceUnrelatedRule: 1,
@@ -158,84 +155,89 @@ module.exports = postcss.plugin('postcss-between', (opts = {}) => {
     return text => headingRegExp.test(text);
   })();
 
-  return root => {
-    var cachedRoots = [];
-    root.walk(rule => {
-      if (rule.type === 'rule') {
-        // break multiple selectors to new lines if requested
-        if (opts.breakMultipleSelectors) {
-          let indentation = rule.raws.before.replace(/^[\s\n]*\n/, '');
-          rule.selector = rule.selector.replace(/\s*,\s*/g, ',\n' + indentation);
-        }
-
-        // no need to space above if it's the first rule
-        if (rule.prev() === undefined) {
-          cachedRoots = generateSelectorStems(rule.selectors);
-          return;
-        }
-
-        // rule + rule
-        if (rule.prev().type === 'rule') {
-          // is this rule in the same BEM block?
-          if (testRelatedSelectors(cachedRoots, rule.selectors)) {
-            rule.raws.before = addNewlinesBefore(rule.raws.before, opts.spaceRelatedRule);
-          } else {
-            rule.raws.before = addNewlinesBefore(rule.raws.before, opts.spaceUnrelatedRule);
-            cachedRoots = generateSelectorStems(rule.selectors);
+  return {
+    postcssPlugin: 'postcss-between',
+    Once (root, { result }) {
+      var cachedRoots = [];
+      root.walk(rule => {
+        if (rule.type === 'rule') {
+          // break multiple selectors to new lines if requested
+          if (opts.breakMultipleSelectors) {
+            let indentation = rule.raws.before.replace(/^[\s\n]*\n/, '');
+            rule.selector = rule.selector.replace(/\s*,\s*/g, ',\n' + indentation);
           }
 
-        // heading comment + rule
-        } else if (rule.prev().type === 'comment' && testHeadingComment(rule.prev().text)) {
-          rule.raws.before = addNewlinesBefore(rule.raws.before, opts.spaceHeadingAfter);
-          cachedRoots = generateSelectorStems(rule.selectors);
-
-        // atrule + rule
-        } else if (rule.prev().type === 'atrule') {
-          // if we're still in a related block, space conservatively
-          if (testRelatedSelectors(cachedRoots, rule.selectors)) {
-            rule.raws.before = addNewlinesBefore(rule.raws.before, opts.spaceRelatedAtRule);
-          // otherwise, isolate the block
-          } else {
-            rule.raws.before = addNewlinesBefore(rule.raws.before, opts.spaceUnrelatedAtRule);
+          // no need to space above if it's the first rule
+          if (rule.prev() === undefined) {
             cachedRoots = generateSelectorStems(rule.selectors);
+            return;
           }
 
-        // anything else + rule
-        } else {
-          cachedRoots = generateSelectorStems(rule.selectors);
-        }
-      }
-
-      if (rule.type === 'comment') {
-        // space major section headings
-        if (rule.prev() !== undefined && testHeadingComment(rule.text)) {
-          rule.raws.before = addNewlinesBefore(rule.raws.before, opts.spaceHeadingBefore);
-        }
-      }
-
-      if (rule.type === 'atrule') {
-        if (rule.prev() === undefined) return;
-
-        if (rule.nodes.length > 0) {
-          // is this a part of a block of related selectors?
-          let innerRules = rule.nodes.filter(node => node.type === 'rule');
-          let innerSelectors = Array.from(innerRules.reduce((acc, cur) => {
-            for (let selector of cur.selectors) {
-              acc.add(selector);
+          // rule + rule
+          if (rule.prev().type === 'rule') {
+            // is this rule in the same BEM block?
+            if (testRelatedSelectors(cachedRoots, rule.selectors)) {
+              rule.raws.before = addNewlinesBefore(rule.raws.before, opts.spaceRelatedRule);
+            } else {
+              rule.raws.before = addNewlinesBefore(rule.raws.before, opts.spaceUnrelatedRule);
+              cachedRoots = generateSelectorStems(rule.selectors);
             }
-            return acc;
-          }, new Set()));
-          if (testRelatedSelectors(cachedRoots, innerSelectors)) {
-            rule.raws.before = addNewlinesBefore(rule.raws.before, opts.spaceRelatedAtRule);
+
+          // heading comment + rule
+          } else if (rule.prev().type === 'comment' && testHeadingComment(rule.prev().text)) {
+            rule.raws.before = addNewlinesBefore(rule.raws.before, opts.spaceHeadingAfter);
+            cachedRoots = generateSelectorStems(rule.selectors);
+
+          // atrule + rule
+          } else if (rule.prev().type === 'atrule') {
+            // if we're still in a related block, space conservatively
+            if (testRelatedSelectors(cachedRoots, rule.selectors)) {
+              rule.raws.before = addNewlinesBefore(rule.raws.before, opts.spaceRelatedAtRule);
+            // otherwise, isolate the block
+            } else {
+              rule.raws.before = addNewlinesBefore(rule.raws.before, opts.spaceUnrelatedAtRule);
+              cachedRoots = generateSelectorStems(rule.selectors);
+            }
+
+          // anything else + rule
+          } else {
+            cachedRoots = generateSelectorStems(rule.selectors);
+          }
+        }
+
+        if (rule.type === 'comment') {
+          // space major section headings
+          if (rule.prev() !== undefined && testHeadingComment(rule.text)) {
+            rule.raws.before = addNewlinesBefore(rule.raws.before, opts.spaceHeadingBefore);
+          }
+        }
+
+        if (rule.type === 'atrule') {
+          if (rule.prev() === undefined) return;
+
+          if (rule.nodes.length > 0) {
+            // is this a part of a block of related selectors?
+            let innerRules = rule.nodes.filter(node => node.type === 'rule');
+            let innerSelectors = Array.from(innerRules.reduce((acc, cur) => {
+              for (let selector of cur.selectors) {
+                acc.add(selector);
+              }
+              return acc;
+            }, new Set()));
+            if (testRelatedSelectors(cachedRoots, innerSelectors)) {
+              rule.raws.before = addNewlinesBefore(rule.raws.before, opts.spaceRelatedAtRule);
+            } else {
+              rule.raws.before = addNewlinesBefore(rule.raws.before, opts.spaceUnrelatedAtRule);
+            }
+
+          // if no children, isolate this block
           } else {
             rule.raws.before = addNewlinesBefore(rule.raws.before, opts.spaceUnrelatedAtRule);
           }
-
-        // if no children, isolate this block
-        } else {
-          rule.raws.before = addNewlinesBefore(rule.raws.before, opts.spaceUnrelatedAtRule);
         }
-      }
-    });
+      });
+    }
   };
-});
+};
+
+module.exports.postcss = true;
