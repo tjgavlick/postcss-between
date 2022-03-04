@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.1.0] - 2022-03-04
+### Changed
+- Migrate to Postcss 8 plugin architecture
+
 ## [1.0.6] - 2021-11-02
 ### Changed
 - Allow for npm versions > 6
